@@ -47,6 +47,7 @@ Set to |v:false| to keep your own indentation options: >lua
 :Jason stop             Stop the system started by the terminal runner.
 :Jason mind             Open the Mind Inspector (|jason-config-mind_url|).
 :Jason format           Format the current buffer (|jason-formatting|).
+:Jason build-server     Build the bundled language server (|jason-lsp|).
 :Jason new {name}       Run `jason app create {name}` in the current
                         directory.
 :Jason add-agent {name} Run `jason app add-agent {name}` in the project root.
@@ -71,8 +72,10 @@ No keys are mapped. The following <Plug> mappings are available:
 ==============================================================================
 5. TREE-SITTER                                              *jason-treesitter*
 
-The `jason` parser (tree-sitter-jason) is registered with nvim-treesitter
-(`main` branch), so `:TSInstall jason` installs it together with its queries
+The `jason` parser, bundled in `tree-sitter-jason/`, is registered with
+nvim-treesitter (`main` branch) and compiled from the plugin's directory, so
+`:TSInstall jason` installs it (`:TSInstall! jason` after updating the plugin)
+together with its queries
 (highlights, folds, textobjects, locals). When the parser is installed, jason
 buffers start tree-sitter highlighting and the Vim syntax is turned off;
 indentation keeps using the plugin's rules. See |jason-config-treesitter|.
@@ -80,14 +83,17 @@ indentation keeps using the plugin's rules. See |jason-config-treesitter|.
 ==============================================================================
 6. LANGUAGE SERVER                                                 *jason-lsp*
 
-`lsp/jason_ls.lua` configures jason-language-server for |vim.lsp.config()|.
-With `jason-language-server` on your PATH: >lua
+`lsp/jason_ls.lua` configures the bundled language server (`server/`) for
+|vim.lsp.config()|. Build it with `:Jason build-server` (npm), or from a
+plugin-manager build hook with `require("jason.server").build({ wait = true })`,
+then: >lua
     vim.lsp.enable("jason_ls")
 <
+Without a build, `jason-language-server` from your PATH is used.
 The root is the directory holding the `.mas2j` file, else the git root.
-Override the command for a local build: >lua
+Override the command with |vim.lsp.config()| to run another build: >lua
     vim.lsp.config("jason_ls", {
-      cmd = { "node", "/path/to/jason-language-server/dist/server.js", "--stdio" },
+      cmd = { "node", "/path/to/server/dist/server.js", "--stdio" },
     })
 <
 ==============================================================================
@@ -133,8 +139,6 @@ plugin loads. Defaults: >lua
       terminal = { position = "botright", size = 15 },
       treesitter = {
         highlight = true,
-        url = "https://github.com/RayIci/tree-sitter-jason",
-        revision = nil,
         path = nil,
       },
     }
@@ -163,10 +167,10 @@ terminal                                           *jason-config-terminal*
 
 treesitter                                       *jason-config-treesitter*
     `highlight`: start tree-sitter highlighting when the parser is
-    installed. `url` and `revision`: where `:TSInstall jason` gets the
-    grammar. `path`: a local tree-sitter-jason checkout used instead of
-    `url`. These options are read when nvim-treesitter installs or updates
-    parsers, so set them before that (e.g. with `vim.g.jason`).
+    installed. `path`: another jason.nvim checkout whose
+    `tree-sitter-jason/` `:TSInstall jason` compiles (default: this
+    plugin). Read when nvim-treesitter installs or updates parsers, so set
+    it before that (e.g. with `vim.g.jason`).
 
 ==============================================================================
 10. HIGHLIGHT GROUPS                                        *jason-highlights*

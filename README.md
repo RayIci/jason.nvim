@@ -33,10 +33,9 @@ agent-oriented language based on AgentSpeak.
 - **Linting** with the parser shipped in the Jason jar, through
   [nvim-lint](https://github.com/mfussenegger/nvim-lint): syntax errors in
   agent programs and project files, unsaved buffers included.
-- **Language server** config for
-  [jason-language-server](https://github.com/RayIci/jason-language-server):
-  outline, go to definition, references, hover docs for internal actions,
-  completion, and diagnostics as you type.
+- **Language server** (bundled in [`server/`](server/)): outline, go to
+  definition, references, hover docs for internal actions, completion, layout
+  formatting, and diagnostics as you type.
 - **Formatting**: full layout through the language server, or
   whitespace and indentation only through
   [conform.nvim](https://github.com/stevearc/conform.nvim) (`jasonfmt`) or
@@ -44,9 +43,12 @@ agent-oriented language based on AgentSpeak.
 - **`:Jason` command** wrapping the [Jason CLI](https://github.com/jason-lang/jason/tree/main/jason-cli):
   run, compile, stop, Mind Inspector, new app, add agent.
 
-Highlighting uses [tree-sitter-jason](https://github.com/RayIci/tree-sitter-jason)
-when its parser is installed, and Vim syntax files (written from the official
-JavaCC grammars) otherwise.
+Highlighting uses the bundled tree-sitter grammar
+([`tree-sitter-jason/`](tree-sitter-jason/)) when its parser is installed, and
+Vim syntax files (written from the official JavaCC grammars) otherwise.
+
+Everything lives in this repository: the Neovim plugin at the root, the
+grammar in `tree-sitter-jason/`, and the language server in `server/`.
 
 ## Requirements
 
@@ -56,24 +58,41 @@ JavaCC grammars) otherwise.
 - For tree-sitter highlighting (optional):
   [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter)
   (`main` branch) and a C compiler.
-- For the language server (optional): Node.js ≥ 20 and
-  [jason-language-server](https://github.com/RayIci/jason-language-server).
+- For the language server (optional): Node.js ≥ 20 and npm, to build it.
 - For linting: [nvim-lint](https://github.com/mfussenegger/nvim-lint), and
   `javac` for the faster compiled checker (optional).
 
 ## Installation
 
-**vim.pack** (Neovim 0.12+)
+**vim.pack** (Neovim 0.12+). The build hook builds the bundled language
+server on install and update:
 
 ```lua
+vim.api.nvim_create_autocmd("PackChanged", {
+  callback = function(ev)
+    if ev.data.spec.name == "jason.nvim" and ev.data.kind ~= "delete" then
+      require("jason.server").build({ wait = true })
+    end
+  end,
+})
 vim.pack.add({ "https://github.com/RayIci/jason.nvim" })
 ```
 
 **lazy.nvim**
 
 ```lua
-{ "RayIci/jason.nvim", ft = { "jason", "mas2j" }, cmd = "Jason" }
+{
+  "RayIci/jason.nvim",
+  ft = { "jason", "mas2j" },
+  cmd = "Jason",
+  build = function()
+    require("jason.server").build({ wait = true })
+  end,
+}
 ```
+
+Without a build hook, run `:Jason build-server` once (and again after
+updating).
 
 Plain `packpath` also works: clone the repo into
 `~/.local/share/nvim/site/pack/plugins/start/`.
@@ -94,9 +113,7 @@ require("jason").setup({
   terminal = { position = "botright", size = 15 },
   treesitter = {
     highlight = true,                   -- start tree-sitter when the parser is installed
-    url = "https://github.com/RayIci/tree-sitter-jason",
-    revision = nil,                     -- pin a commit for :TSInstall
-    path = nil,                         -- or install from a local checkout
+    path = nil,                         -- another jason.nvim checkout to compile the grammar from
   },
 })
 ```
@@ -132,6 +149,7 @@ require("jason").setup({
 | `:Jason stop`            | Stop the system started by the built-in terminal runner        |
 | `:Jason mind`            | Open the Mind Inspector in the browser                         |
 | `:Jason format`          | Format the current buffer                                      |
+| `:Jason build-server`    | Build the bundled language server (`npm ci`, `npm run build`)  |
 | `:Jason new {name}`      | `jason app create {name}` in the current directory             |
 | `:Jason add-agent {name}`| `jason app add-agent {name}` in the project root               |
 
@@ -151,11 +169,16 @@ vim.keymap.set("n", "<leader>jm", "<Plug>(jason-mind)")
 
 ### Tree-sitter
 
-jason.nvim registers the `jason` parser with nvim-treesitter, so install it once:
+jason.nvim registers the bundled `jason` parser with nvim-treesitter, so
+install it once:
 
 ```vim
 :TSInstall jason
 ```
+
+It's compiled from the plugin's own `tree-sitter-jason/` directory, so it
+always matches the plugin version. Run `:TSInstall! jason` after updating
+the plugin to pick up grammar changes.
 
 From then on, jason buffers use tree-sitter highlighting with the grammar's
 queries: highlights, folds, locals, and text objects for
@@ -181,19 +204,17 @@ vim.api.nvim_create_autocmd("FileType", {
 
 ### Language server
 
-Install [jason-language-server](https://github.com/RayIci/jason-language-server)
-so `jason-language-server` is on `PATH`, then:
+Build the bundled server (the build hook above, or `:Jason build-server`),
+then:
 
 ```lua
 vim.lsp.enable("jason_ls")
 ```
 
-The config lives in `lsp/jason_ls.lua`. The project root is the directory
-with the `.mas2j` file. To run a local build instead:
-
-```lua
-vim.lsp.config("jason_ls", { cmd = { "node", "/path/to/jason-language-server/dist/server.js", "--stdio" } })
-```
+The config lives in `lsp/jason_ls.lua`. It runs `server/dist/server.js` once
+that's built, and otherwise `jason-language-server` from `PATH`. The project
+root is the directory with the `.mas2j` file. See [`server/`](server/) for
+using the server from other editors.
 
 The server reports every syntax error as you type. `jasonlint` (below) runs
 Jason's real parser, which is stricter but stops at the first error. Use
@@ -298,10 +319,10 @@ Main groups: `jasonTrigger`, `jasonGoal`, `jasonBeliefUpdate`,
 - [x] `:Jason` command: run, compile, stop, Mind Inspector, new app, add agent
 - [x] **Linting** with the parser in the Jason jar, through nvim-lint
 - [x] **Formatting**: spacing and indentation, through conform.nvim or `:Jason format`
-- [x] **Tree-sitter grammar**: [tree-sitter-jason](https://github.com/RayIci/tree-sitter-jason)
+- [x] **Tree-sitter grammar**: [`tree-sitter-jason/`](tree-sitter-jason/)
       with highlights, folds, text objects and locals
 - [x] **Full formatting**: plan and rule layout in the language server
-- [x] **Language server**: [jason-language-server](https://github.com/RayIci/jason-language-server)
+- [x] **Language server**: [`server/`](server/)
       with outline, definitions, references, hover, completion and diagnostics
 
 ## Development
@@ -309,8 +330,10 @@ Main groups: `jasonTrigger`, `jasonGoal`, `jasonBeliefUpdate`,
 ```sh
 nvim --clean --headless -l tests/run.lua
 nvim --clean --headless -l tests/lint.lua         # needs nvim-lint and the jason CLI
-nvim --clean --headless -l tests/treesitter.lua   # needs ../tree-sitter-jason and cc
-nvim --clean --headless -l tests/lsp.lua          # needs ../jason-language-server built, and node
+nvim --clean --headless -l tests/treesitter.lua   # needs cc
+nvim --clean --headless -l tests/lsp.lua          # needs the server built (:Jason build-server), and node
+(cd server && npm test)
+(cd tree-sitter-jason && tree-sitter test)
 ```
 
 `tests/run.lua` checks filetype detection, the syntax group at each construct

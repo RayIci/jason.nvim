@@ -31,8 +31,9 @@ Every `.asl` program bundled with Jason 3.3 parses without errors.
 
 ## Neovim
 
-[jason.nvim](https://github.com/RayIci/jason.nvim) registers this parser with
-nvim-treesitter, so `:TSInstall jason` is enough. Without jason.nvim:
+This grammar is part of [jason.nvim](https://github.com/RayIci/jason.nvim),
+which registers it with nvim-treesitter, so `:TSInstall jason` is enough.
+Without the plugin:
 
 ```lua
 vim.api.nvim_create_autocmd("User", {
@@ -40,8 +41,9 @@ vim.api.nvim_create_autocmd("User", {
   callback = function()
     require("nvim-treesitter.parsers").jason = {
       install_info = {
-        url = "https://github.com/RayIci/tree-sitter-jason",
-        queries = "queries",
+        url = "https://github.com/RayIci/jason.nvim",
+        location = "tree-sitter-jason",
+        queries = "tree-sitter-jason/queries",
       },
     }
   end,

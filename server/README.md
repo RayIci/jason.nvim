@@ -2,9 +2,9 @@
 
 A [Language Server](https://microsoft.github.io/language-server-protocol/) for
 [Jason](https://github.com/jason-lang/jason) (AgentSpeak) agent programs
-(`.asl`). It parses with
-[tree-sitter-jason](https://github.com/RayIci/tree-sitter-jason), compiled to
-WebAssembly, so it needs only Node.js.
+(`.asl`), part of [jason.nvim](https://github.com/RayIci/jason.nvim). It
+parses with the grammar in `../tree-sitter-jason`, compiled to WebAssembly,
+so it needs only Node.js.
 
 ## Features
 
@@ -47,9 +47,9 @@ WebAssembly, so it needs only Node.js.
 ## Install
 
 ```sh
-git clone https://github.com/RayIci/jason-language-server
-cd jason-language-server
-npm install
+git clone https://github.com/RayIci/jason.nvim
+cd jason.nvim/server
+npm ci
 npm run build
 npm link        # puts `jason-language-server` on PATH
 ```
@@ -58,8 +58,8 @@ Run it with `jason-language-server --stdio`.
 
 ## Editors
 
-**Neovim**: [jason.nvim](https://github.com/RayIci/jason.nvim) ships the
-config (`lsp/jason_ls.lua`). Enable it with:
+**Neovim**: jason.nvim builds this server (`:Jason build-server`) and ships
+the config (`lsp/jason_ls.lua`). Enable it with:
 
 ```lua
 vim.lsp.enable("jason_ls")
