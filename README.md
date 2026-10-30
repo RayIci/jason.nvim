@@ -29,6 +29,14 @@ WebAssembly, so it needs only Node.js.
     Jason jar)
   - the plans that handle a goal
   - where a belief is defined
+- **Formatting**
+  - plans and rules written on one line stay that way when they fit
+  - longer ones get the context under the trigger and one body formula per
+    line, aligned after `<-`; rules break at their top-level `&`
+  - `if`/`for`/`while` blocks and sub-plans are indented
+  - spacing is normalised; comments and single blank lines are kept
+  - the result is re-parsed and must hold exactly the same tokens and comments,
+    otherwise nothing is changed. Files with syntax errors aren't formatted.
 - **Completion**
   - internal actions after `.`
   - goals after `!` / `!!` / `+!`, with the plan's parameters as placeholders
@@ -59,6 +67,16 @@ vim.lsp.enable("jason_ls")
 
 **Other editors**: start `jason-language-server --stdio` for `.asl` files. The
 workspace root should be the folder with the `.mas2j` file.
+
+### Options
+
+Set these as `initializationOptions`:
+
+```json
+{ "formatting": { "maxWidth": 100 } }
+```
+
+Indentation follows the editor's `tabSize` / `insertSpaces`.
 
 ## Development
 
