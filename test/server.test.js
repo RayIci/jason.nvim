@@ -167,3 +167,15 @@ test('completes internal actions, goals, performatives and variables', async () 
   const vars = await at(3, 19);
   assert.deepEqual(vars.map(i => i.label), ['X']);
 });
+
+test('formats the document', async () => {
+  const doc = uri('src/agt/format_me.asl');
+  open(doc, '+!g:true<-a;b.\n');
+  await diagnosticsFor(doc);
+  const edits = await conn.sendRequest('textDocument/formatting', { textDocument: { uri: doc }, options: { tabSize: 4, insertSpaces: true } });
+  assert.equal(edits.length, 1);
+  assert.equal(edits[0].newText, '+!g : true <- a; b.\n');
+  const broken = uri('src/agt/broken.asl');
+  const none = await conn.sendRequest('textDocument/formatting', { textDocument: { uri: broken }, options: { tabSize: 4, insertSpaces: true } });
+  assert.deepEqual(none, []);
+});
