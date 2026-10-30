@@ -4,7 +4,7 @@ MAS demo {
     environment: example.Env(10)
 
     agents: bob;
-            alice agentArchClass jason.architecture.AgArch [verbose=2] #3;
+            alice [verbose=2] agentArchClass jason.architecture.AgArch #3;
 
     aslSourcePath: "src/agt";
 }
