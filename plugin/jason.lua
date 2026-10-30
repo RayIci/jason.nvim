@@ -35,6 +35,11 @@ local subcommands = {
       require("jason.run").mind()
     end,
   },
+  format = {
+    impl = function()
+      require("jason.format").buffer(0)
+    end,
+  },
   new = {
     nargs = "1",
     prompt = "New Jason app name: ",
