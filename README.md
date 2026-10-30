@@ -30,6 +30,9 @@ agent-oriented language based on AgentSpeak.
   and 4-space indents.
 - **Snippets** in VS Code format for plans, rules, `if`/`for`/`while`, `.send`,
   namespaces, and `MAS` projects.
+- **Linting** with the parser shipped in the Jason jar, through
+  [nvim-lint](https://github.com/mfussenegger/nvim-lint): syntax errors in
+  agent programs and project files, unsaved buffers included.
 - **`:Jason` command** wrapping the [Jason CLI](https://github.com/jason-lang/jason/tree/main/jason-cli):
   run, compile, stop, Mind Inspector, new app, add agent.
 
@@ -39,8 +42,10 @@ grammars. There is no tree-sitter parser for Jason yet (see the [roadmap](#roadm
 ## Requirements
 
 - Neovim ≥ 0.11
-- For `:Jason`: the `jason` CLI in `PATH` (Java 17+). See the
+- For `:Jason` and linting: the `jason` CLI in `PATH` (Java 17+). See the
   [installation guide](https://github.com/jason-lang/jason/blob/main/doc/install.adoc).
+- For linting: [nvim-lint](https://github.com/mfussenegger/nvim-lint), and
+  `javac` for the faster compiled checker (optional).
 
 ## Installation
 
@@ -68,6 +73,7 @@ Call `setup()` only to change the defaults (or set `vim.g.jason` to the same tab
 ```lua
 require("jason").setup({
   cmd = "jason",                        -- Jason CLI executable
+  jar = nil,                            -- Jason jar for linting (default: the `cmd` launcher)
   run_args = {},                        -- extra args for `jason <app>.mas2j`
   mind_url = "http://127.0.0.1:3272",   -- opened by :Jason mind
   runner = "terminal",                  -- or fun(spec) to use your own task runner
@@ -122,6 +128,31 @@ vim.keymap.set("n", "<leader>js", "<Plug>(jason-stop)")
 vim.keymap.set("n", "<leader>jm", "<Plug>(jason-mind)")
 ```
 
+### Linting
+
+The plugin provides a `jasonlint` linter for nvim-lint:
+
+```lua
+require("lint").linters_by_ft.jason = { "jasonlint" }
+require("lint").linters_by_ft.mas2j = { "jasonlint" }
+```
+
+It runs the parsers bundled in the Jason jar (found through the `jason`
+launcher, or the `jar` option) on the buffer contents. The first check
+compiles `tools/JasonLint.java` into Neovim's cache directory in the
+background. After that, a check takes about 0.25 s.
+
+The Jason parser stops at the first error, so you see one diagnostic at a
+time. Directives that a project registers in its `.mas2j` (`directives: ld =
+my.Directive;`) can't be checked on their own; they show up as a warning and
+the rest of the file is skipped.
+
+You can also run the checker from a shell:
+
+```sh
+java -cp "$(readlink -f "$(command -v jason)")" tools/JasonLint.java src/agt/bob.asl
+```
+
 ### Snippets
 
 The snippets live in `snippets/`, with a `package.json` at the plugin root.
@@ -167,13 +198,10 @@ Main groups: `jasonTrigger`, `jasonGoal`, `jasonBeliefUpdate`,
 - [x] Indentation for plans, bodies, and `{ }` blocks
 - [x] Snippets (VS Code format)
 - [x] `:Jason` command: run, compile, stop, Mind Inspector, new app, add agent
-- [ ] **Linting**: a small wrapper around the parser in the Jason jar that
-      reports `file:line:col: message`, plus an
-      [nvim-lint](https://github.com/mfussenegger/nvim-lint) linter definition
+- [x] **Linting** with the parser in the Jason jar, through nvim-lint
 - [ ] **Formatting**: re-indent plan bodies and normalise spacing around
       `:`, `<-` and `;` (a Lua formatter usable from
       [conform.nvim](https://github.com/stevearc/conform.nvim))
-- [ ] JaCaMo support: `.jcm` project files
 - [ ] **Tree-sitter grammar** (`tree-sitter-jason`), generated from
       `AS2JavaParser.jj`: better highlighting, text objects (plans, bodies),
       folding, and a symbol outline
@@ -185,6 +213,7 @@ Main groups: `jasonTrigger`, `jasonGoal`, `jasonBeliefUpdate`,
 
 ```sh
 nvim --clean --headless -l tests/run.lua
+nvim --clean --headless -l tests/lint.lua   # needs nvim-lint and the jason CLI
 ```
 
 This checks filetype detection, the syntax group at each construct in

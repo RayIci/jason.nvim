@@ -7,14 +7,15 @@ CONTENTS                                                      *jason-contents*
   2. Filetypes .................................. |jason-filetypes|
   3. Commands ................................... |jason-commands|
   4. Mappings ................................... |jason-mappings|
-  5. Configuration .............................. |jason-configuration|
-  6. Highlight groups ........................... |jason-highlights|
+  5. Linting .................................... |jason-linting|
+  6. Configuration .............................. |jason-configuration|
+  7. Highlight groups ........................... |jason-highlights|
 
 ==============================================================================
 1. INTRODUCTION                                           *jason-introduction*
 
 jason.nvim adds filetype detection, syntax highlighting, indentation,
-snippets and Jason CLI integration for Jason agent programs (`*.asl`) and
+snippets, linting and Jason CLI integration for Jason agent programs (`*.asl`) and
 multi-agent system project files (`*.mas2j`).
 
 No setup() call is needed.
@@ -64,12 +65,30 @@ No keys are mapped. The following <Plug> mappings are available:
 <Plug>(jason-mind)      |:Jason| mind
 
 ==============================================================================
-5. CONFIGURATION                                         *jason-configuration*
+5. LINTING                                                     *jason-linting*
+
+The `jasonlint` linter for nvim-lint runs the parsers bundled in the Jason
+jar on the buffer contents: >lua
+    require("lint").linters_by_ft.jason = { "jasonlint" }
+    require("lint").linters_by_ft.mas2j = { "jasonlint" }
+<
+The jar is found through the `jason` launcher (|jason-config-cmd|) or set
+with |jason-config-jar|. On first use `tools/JasonLint.java` is compiled into
+`stdpath("cache")/jason.nvim/` in the background (needs `javac`); until then
+Java runs the source file directly, which is slower.
+
+The parser stops at the first error, so there is one diagnostic at a time.
+Directives registered by a project's `.mas2j` cannot be checked in a single
+file: they are reported as a warning and the rest of the file is skipped.
+
+==============================================================================
+6. CONFIGURATION                                         *jason-configuration*
 
 Pass options to `require("jason").setup()` or set `vim.g.jason` before the
 plugin loads. Defaults: >lua
     {
       cmd = "jason",
+      jar = nil,
       run_args = {},
       mind_url = "http://127.0.0.1:3272",
       runner = "terminal",
@@ -78,6 +97,10 @@ plugin loads. Defaults: >lua
 <
 cmd                                                     *jason-config-cmd*
     Jason CLI executable.
+
+jar                                                     *jason-config-jar*
+    Jason jar used by the linter. Default: the file the `cmd` launcher
+    resolves to (the launcher is a jar with a shell stub).
 
 run_args                                           *jason-config-run_args*
     Extra arguments appended to `jason <app>.mas2j`.
@@ -95,7 +118,7 @@ terminal                                           *jason-config-terminal*
     |:botright| style modifier, `size` the height (or width).
 
 ==============================================================================
-6. HIGHLIGHT GROUPS                                         *jason-highlights*
+7. HIGHLIGHT GROUPS                                         *jason-highlights*
 
 Groups are linked by default and can be overridden with |nvim_set_hl()|.
 
