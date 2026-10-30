@@ -133,7 +133,8 @@ function M.get(lnum)
   if trigger and not prev:match(";$") then
     return pind + sw
   end
-  if prev:match("<%-$") or prev:match(":$") then
+  -- `head :-` / `... <-` / `... :` with the rest on the next line.
+  if prev:match("<%-$") or prev:match(":%-$") or prev:match(":$") then
     return pind + sw
   end
 
