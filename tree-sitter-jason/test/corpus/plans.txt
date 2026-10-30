@@ -1,0 +1,215 @@
+================================================================================
+Triggers
+================================================================================
+
++b.
+-b.
++!g.
+-!g.
++?q.
+-?q.
+^!g.
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (plan
+    (trigger
+      (literal
+        (atom
+          (identifier)))))
+  (plan
+    (trigger
+      (literal
+        (atom
+          (identifier)))))
+  (plan
+    (trigger
+      (literal
+        (atom
+          (identifier)))))
+  (plan
+    (trigger
+      (literal
+        (atom
+          (identifier)))))
+  (plan
+    (trigger
+      (literal
+        (atom
+          (identifier)))))
+  (plan
+    (trigger
+      (literal
+        (atom
+          (identifier)))))
+  (plan
+    (trigger
+      (literal
+        (atom
+          (identifier))))))
+
+================================================================================
+Context, body and labels
+================================================================================
+
+@greet[atomic, priority(2)]
++!start : ready & not busy
+    <- .print("hello");
+       +greeted;
+       -+count(1);
+       -count(C);
+       ?count(N);
+       !next;
+       !!loop(N).
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (plan
+    (label
+      (atom
+        (identifier))
+      (list
+        (literal
+          (atom
+            (identifier)))
+        (literal
+          (atom
+            (identifier))
+          (arguments
+            (number)))))
+    (trigger
+      (literal
+        (atom
+          (identifier))))
+    (binary_expression
+      (literal
+        (atom
+          (identifier)))
+      (not_expression
+        (literal
+          (atom
+            (identifier)))))
+    (plan_body
+      (literal
+        (internal_action)
+        (arguments
+          (string)))
+      (belief_update
+        (literal
+          (atom
+            (identifier))))
+      (belief_update
+        (literal
+          (atom
+            (identifier))
+          (arguments
+            (number))))
+      (belief_update
+        (literal
+          (atom
+            (identifier))
+          (arguments
+            (literal
+              (variable)))))
+      (test_goal
+        (literal
+          (atom
+            (identifier))
+          (arguments
+            (literal
+              (variable)))))
+      (achieve
+        (literal
+          (atom
+            (identifier))))
+      (achieve
+        (literal
+          (atom
+            (identifier))
+          (arguments
+            (literal
+              (variable))))))))
+
+================================================================================
+Goal condition and sub-plans
+================================================================================
+
++!g <: done <- act.
++!outer <- !inner. {
+    +!inner <- .print("in").
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (plan
+    (trigger
+      (literal
+        (atom
+          (identifier))))
+    (literal
+      (atom
+        (identifier)))
+    (plan_body
+      (literal
+        (atom
+          (identifier)))))
+  (plan
+    (trigger
+      (literal
+        (atom
+          (identifier))))
+    (plan_body
+      (achieve
+        (literal
+          (atom
+            (identifier)))))
+    (sub_plans
+      (plan
+        (trigger
+          (literal
+            (atom
+              (identifier))))
+        (plan_body
+          (literal
+            (internal_action)
+            (arguments
+              (string))))))))
+
+================================================================================
+Parallel formulas and groups
+================================================================================
+
++!g <- !a |&| !b ||| (!c; !d).
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (plan
+    (trigger
+      (literal
+        (atom
+          (identifier))))
+    (plan_body
+      (parallel_or
+        (parallel_and
+          (achieve
+            (literal
+              (atom
+                (identifier))))
+          (achieve
+            (literal
+              (atom
+                (identifier)))))
+        (body_group
+          (plan_body
+            (achieve
+              (literal
+                (atom
+                  (identifier))))
+            (achieve
+              (literal
+                (atom
+                  (identifier))))))))))

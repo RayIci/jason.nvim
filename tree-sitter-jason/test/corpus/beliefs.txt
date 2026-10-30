@@ -1,0 +1,150 @@
+================================================================================
+Beliefs, negation and namespaces
+================================================================================
+
+count(0).
+~raining.
+ns::pos(1, 2)[source(self)].
+true.
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (belief
+    (literal
+      (atom
+        (identifier))
+      (arguments
+        (number))))
+  (belief
+    (literal
+      (atom
+        (identifier))))
+  (belief
+    (literal
+      (namespace
+        (atom
+          (identifier)))
+      (atom
+        (identifier))
+      (arguments
+        (number)
+        (number))
+      (list
+        (literal
+          (atom
+            (identifier))
+          (arguments
+            (literal
+              (atom
+                (identifier))))))))
+  (belief
+    (literal
+      (true))))
+
+================================================================================
+Rules
+================================================================================
+
+busy :- count(N) & N > 3.
+tower([X, Y|T]) :- on(X, Y) & tower([Y|T]).
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (rule
+    (literal
+      (atom
+        (identifier)))
+    (binary_expression
+      (literal
+        (atom
+          (identifier))
+        (arguments
+          (literal
+            (variable))))
+      (binary_expression
+        (literal
+          (variable))
+        (number))))
+  (rule
+    (literal
+      (atom
+        (identifier))
+      (arguments
+        (list
+          (literal
+            (variable))
+          (literal
+            (variable))
+          (variable))))
+    (binary_expression
+      (literal
+        (atom
+          (identifier))
+        (arguments
+          (literal
+            (variable))
+          (literal
+            (variable))))
+      (literal
+        (atom
+          (identifier))
+        (arguments
+          (list
+            (literal
+              (variable))
+            (variable)))))))
+
+================================================================================
+Initial goals
+================================================================================
+
+!start.
+!move(a, b).
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (initial_goal
+    (literal
+      (atom
+        (identifier))))
+  (initial_goal
+    (literal
+      (atom
+        (identifier))
+      (arguments
+        (literal
+          (atom
+            (identifier)))
+        (literal
+          (atom
+            (identifier)))))))
+
+================================================================================
+Strings, quoted atoms and numbers
+================================================================================
+
+msg("tab\there \"quoted\"", 'Quoted Atom', 3.14, .5, 1e3, -2).
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (belief
+    (literal
+      (atom
+        (identifier))
+      (arguments
+        (string
+          (escape_sequence)
+          (escape_sequence)
+          (escape_sequence))
+        (literal
+          (atom
+            (quoted_atom)))
+        (number)
+        (number)
+        (number)
+        (unary_expression
+          (number))))))
