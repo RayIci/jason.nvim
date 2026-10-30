@@ -7,6 +7,7 @@ vim.g.loaded_jason = true
 ---@field impl fun(args: string[])
 ---@field complete? fun(arglead: string): string[]
 ---@field nargs? "?"|"1"
+---@field prompt? string asked via vim.ui.input when a required argument is missing
 
 ---@type table<string, jason.Subcommand>
 local subcommands = {
@@ -36,12 +37,14 @@ local subcommands = {
   },
   new = {
     nargs = "1",
+    prompt = "New Jason app name: ",
     impl = function(args)
       require("jason.run").new(args[1])
     end,
   },
   ["add-agent"] = {
     nargs = "1",
+    prompt = "New agent name: ",
     impl = function(args)
       require("jason.run").add_agent(args[1])
     end,
@@ -55,8 +58,19 @@ vim.api.nvim_create_user_command("Jason", function(opts)
     vim.notify("Jason: unknown subcommand " .. tostring(name), vim.log.levels.ERROR)
     return
   end
+  if sub.nargs == "1" and #args == 0 and sub.prompt then
+    vim.ui.input({ prompt = sub.prompt }, function(input)
+      input = input and vim.trim(input) or ""
+      if input ~= "" and not input:find("%s") then
+        sub.impl({ input })
+      elseif input ~= "" then
+        vim.notify(("Jason %s: the name cannot contain spaces"):format(name), vim.log.levels.ERROR)
+      end
+    end)
+    return
+  end
   if sub.nargs == "1" and #args ~= 1 then
-    vim.notify(("Jason %s: expected one argument"):format(name), vim.log.levels.ERROR)
+    vim.notify(("Jason %s: expected one name"):format(name), vim.log.levels.ERROR)
     return
   end
   sub.impl(args)

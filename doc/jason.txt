@@ -50,6 +50,9 @@ The project file is the buffer itself when it is a `.mas2j`; otherwise it is
 the nearest `.mas2j` found searching upward from the buffer, then from the
 current directory. When a directory holds several you're asked to choose.
 
+`new` and `add-agent` ask for {name} with |vim.ui.input()| when it is
+omitted.
+
 ==============================================================================
 4. MAPPINGS                                                   *jason-mappings*
 

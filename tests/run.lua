@@ -113,5 +113,18 @@ vim.cmd("Jason run")
 check(spec and spec.cwd == root .. "/tests/fixtures", "run cwd: " .. vim.inspect(spec))
 check(spec and vim.deep_equal(spec.cmd, { "jason", "sample.mas2j", "-v" }), "run cmd: " .. vim.inspect(spec and spec.cmd))
 
+-- :Jason new without a name asks for one
+local asked
+local input = vim.ui.input
+vim.ui.input = function(opts, cb)
+  asked = opts.prompt
+  cb("my_app")
+end
+spec = nil
+vim.cmd("Jason new")
+vim.ui.input = input
+check(asked == "New Jason app name: ", "new prompts for a name: " .. tostring(asked))
+check(spec and vim.deep_equal(spec.cmd, { "jason", "app", "create", "my_app" }), "new cmd: " .. vim.inspect(spec and spec.cmd))
+
 io.stdout:write(failures == 0 and "all checks passed\n" or (failures .. " failure(s)\n"))
 os.exit(failures == 0 and 0 or 1)

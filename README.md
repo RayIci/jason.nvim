@@ -109,6 +109,7 @@ require("jason").setup({
 | `:Jason add-agent {name}`| `jason app add-agent {name}` in the project root               |
 
 If a directory holds several `.mas2j` files, you're asked to pick one.
+`new` and `add-agent` ask for the name when you leave it out.
 
 ### Mappings
 
