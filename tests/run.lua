@@ -126,5 +126,23 @@ vim.ui.input = input
 check(asked == "New Jason app name: ", "new prompts for a name: " .. tostring(asked))
 check(spec and vim.deep_equal(spec.cmd, { "jason", "app", "create", "my_app" }), "new cmd: " .. vim.inspect(spec and spec.cmd))
 
+-- Formatter: expected output, idempotency, and fixtures already formatted
+local format = require("jason.format")
+local fixtures = root .. "/tests/fixtures/"
+local got = format.format(vim.fn.readfile(fixtures .. "messy.asl"), "jason")
+local want = vim.fn.readfile(fixtures .. "messy.formatted.asl")
+for i = 1, math.max(#got, #want) do
+  check(got[i] == want[i], ("messy.asl:%d format\n  want |%s|\n  got  |%s|"):format(i, want[i], got[i]))
+end
+check(vim.deep_equal(format.format(want, "jason"), want), "format is idempotent")
+for _, f in ipairs({ "sample.asl", "sample.mas2j" }) do
+  local lines = vim.fn.readfile(fixtures .. f)
+  check(vim.deep_equal(format.format(lines, f:match("mas2j$") or "jason"), lines), f .. " is already formatted")
+end
+vim.cmd.edit(fixtures .. "messy.asl")
+vim.cmd("Jason format")
+check(vim.deep_equal(vim.api.nvim_buf_get_lines(0, 0, -1, false), want), ":Jason format")
+vim.cmd("edit!")
+
 io.stdout:write(failures == 0 and "all checks passed\n" or (failures .. " failure(s)\n"))
 os.exit(failures == 0 and 0 or 1)

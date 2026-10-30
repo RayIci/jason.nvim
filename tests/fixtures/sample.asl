@@ -16,17 +16,17 @@ busy :- count(N) & N > 3.
        !!loop(_, X).
 
 +!loop(A, B)
-    :   ready & not busy
-    <-  while (count(C) & C < 10) {
-            .wait(100);
-            if (C mod 2 == 0) {
-                .print("even ", C);
-            } else {
-                -count(C);
-            }
-        }
-        ?count(Final);
-        my.lib.action(Final, 'quoted atom', 3.14).
+    : ready & not busy
+    <- while (count(C) & C < 10) {
+           .wait(100);
+           if (C mod 2 == 0) {
+               .print("even ", C);
+           } else {
+               -count(C);
+           }
+       }
+       ?count(Final);
+       my.lib.action(Final, 'quoted atom', 3.14).
 
 +msg(M)[source(Ag)]
     <- .send(Ag, tell, ack(M)).
