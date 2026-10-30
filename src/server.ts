@@ -12,6 +12,7 @@ import {
 } from 'vscode-languageserver/node';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { completion, definition, documentSymbols, hover, references, workspaceSymbols } from './features.js';
+import { format } from './format.js';
 import { initParser } from './parser.js';
 import { uriToPath, Workspace } from './workspace.js';
 
@@ -24,6 +25,7 @@ const connection = createConnection(ProposedFeatures.all);
 const documents = new TextDocuments(TextDocument);
 const ws = new Workspace();
 let watchFiles = false;
+let maxWidth = 100;
 let ready: Promise<void> = Promise.resolve();
 
 function publish(uri: string): void {
@@ -42,6 +44,10 @@ connection.onInitialize(async (params): Promise<InitializeResult> => {
     }
   })();
   watchFiles = params.capabilities.workspace?.didChangeWatchedFiles?.dynamicRegistration === true;
+  const width = (params.initializationOptions as { formatting?: { maxWidth?: unknown } } | undefined)?.formatting?.maxWidth;
+  if (typeof width === 'number' && width > 0) {
+    maxWidth = width;
+  }
   return {
     capabilities: {
       textDocumentSync: TextDocumentSyncKind.Full,
@@ -51,6 +57,7 @@ connection.onInitialize(async (params): Promise<InitializeResult> => {
       referencesProvider: true,
       hoverProvider: true,
       completionProvider: { triggerCharacters: ['.', '!', '?', '+', '-'] },
+      documentFormattingProvider: true,
     },
     serverInfo: { name: 'jason-language-server', version: '0.1.0' },
   };
@@ -114,6 +121,21 @@ connection.onCompletion(async p => {
   await ready;
   const doc = documents.get(p.textDocument.uri);
   return doc ? completion(ws, doc, p.position) : [];
+});
+
+connection.onDocumentFormatting(async p => {
+  await ready;
+  const doc = documents.get(p.textDocument.uri);
+  const tree = ws.tree(p.textDocument.uri);
+  if (!doc || !tree) {
+    return [];
+  }
+  const indent = p.options.insertSpaces ? ' '.repeat(p.options.tabSize) : '\t';
+  const text = format(tree, { indent, width: maxWidth });
+  if (text === null || text === doc.getText()) {
+    return []; // syntax errors, or already formatted
+  }
+  return [{ range: { start: { line: 0, character: 0 }, end: doc.positionAt(doc.getText().length) }, newText: text }];
 });
 
 documents.listen(connection);
