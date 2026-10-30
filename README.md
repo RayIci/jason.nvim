@@ -37,8 +37,10 @@ agent-oriented language based on AgentSpeak.
   [jason-language-server](https://github.com/RayIci/jason-language-server):
   outline, go to definition, references, hover docs for internal actions,
   completion, and diagnostics as you type.
-- **Formatting** (whitespace and indentation only) through
-  [conform.nvim](https://github.com/stevearc/conform.nvim) or `:Jason format`.
+- **Formatting**: full layout through the language server, or
+  whitespace and indentation only through
+  [conform.nvim](https://github.com/stevearc/conform.nvim) (`jasonfmt`) or
+  `:Jason format`, with no extra dependencies.
 - **`:Jason` command** wrapping the [Jason CLI](https://github.com/jason-lang/jason/tree/main/jason-cli):
   run, compile, stop, Mind Inspector, new app, add agent.
 
@@ -245,7 +247,9 @@ whitespace, outside strings, quoted atoms and comments:
 +!start : true <- .print("hi"); !!loop(_, X).  // after
 ```
 
-It doesn't break long lines or move plan bodies onto their own lines.
+It doesn't break long lines or move plan bodies onto their own lines. For
+that, use the language server's formatter (`vim.lsp.buf.format()`, or conform
+with `lsp_format = "fallback"` and no conform formatter for `jason`).
 
 ### Snippets
 
@@ -296,8 +300,7 @@ Main groups: `jasonTrigger`, `jasonGoal`, `jasonBeliefUpdate`,
 - [x] **Formatting**: spacing and indentation, through conform.nvim or `:Jason format`
 - [x] **Tree-sitter grammar**: [tree-sitter-jason](https://github.com/RayIci/tree-sitter-jason)
       with highlights, folds, text objects and locals
-- [ ] **Full formatting**: break long lines and lay out plan bodies, on top
-      of the tree-sitter grammar
+- [x] **Full formatting**: plan and rule layout in the language server
 - [x] **Language server**: [jason-language-server](https://github.com/RayIci/jason-language-server)
       with outline, definitions, references, hover, completion and diagnostics
 

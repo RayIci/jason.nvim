@@ -50,6 +50,18 @@ if client then
   local def = client:request_sync("textDocument/definition", params, 5000, 0)
   local loc = def and def.result and def.result[1]
   check(loc and loc.uri:match("common%.asl$"), "definition of !greet: " .. vim.inspect(def))
+
+  -- Layout formatting through vim.lsp.buf.format()
+  vim.cmd("enew")
+  vim.api.nvim_buf_set_name(0, project .. "/src/agt/format_check.asl")
+  vim.bo.filetype = "jason"
+  vim.api.nvim_buf_set_lines(0, 0, -1, false, { "+!g:true<-a;b." })
+  vim.wait(5000, function()
+    return #vim.lsp.get_clients({ bufnr = 0, name = "jason_ls" }) > 0
+  end, 50)
+  vim.lsp.buf.format({ name = "jason_ls", timeout_ms = 5000 })
+  local got = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+  check(vim.deep_equal(got, { "+!g : true <- a; b." }), "lsp formatting: " .. vim.inspect(got))
 end
 
 io.stdout:write(failures == 0 and "all lsp checks passed\n" or (failures .. " failure(s)\n"))
