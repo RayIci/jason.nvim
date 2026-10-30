@@ -33,9 +33,16 @@ public class JasonLint {
         // start the Mind Inspector web server (and grab its port).
         jason.util.Config.get().setProperty("startWebMindInspector", "false");
         String file = args[args.length - 1];
-        String source = stdin
-                ? new String(System.in.readAllBytes(), StandardCharsets.UTF_8)
-                : Files.readString(Path.of(file), StandardCharsets.UTF_8);
+        String source;
+        try {
+            source = stdin
+                    ? new String(System.in.readAllBytes(), StandardCharsets.UTF_8)
+                    : Files.readString(Path.of(file), StandardCharsets.UTF_8);
+        } catch (java.io.IOException e) {
+            System.out.println(file + ":" + at(1, 1, "cannot read file: " + e.getMessage()));
+            System.exit(1);
+            return;
+        }
         Reader in = new StringReader(source);
         String error = file.endsWith(".mas2j") ? checkMas2j(in) : checkAsl(in, file, source);
         if (error != null) {
