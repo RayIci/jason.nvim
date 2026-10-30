@@ -3,6 +3,8 @@ if vim.g.loaded_jason then
 end
 vim.g.loaded_jason = true
 
+require("jason.treesitter").register()
+
 ---@class jason.Subcommand
 ---@field impl fun(args: string[])
 ---@field complete? fun(arglead: string): string[]

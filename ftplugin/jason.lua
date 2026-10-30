@@ -5,3 +5,4 @@ end
 vim.b.did_ftplugin = true
 
 require("jason.ftplugin").apply()
+require("jason.treesitter").start(0)

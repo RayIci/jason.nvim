@@ -10,6 +10,13 @@
 ---@field mind_url string Mind Inspector URL opened by `:Jason mind`
 ---@field runner "terminal"|fun(spec: jason.RunSpec) how commands are executed
 ---@field terminal { position: string, size: integer } split used by the "terminal" runner
+---@field treesitter jason.TreesitterConfig
+
+---@class jason.TreesitterConfig
+---@field highlight boolean start tree-sitter highlighting when the parser is installed
+---@field url string tree-sitter-jason repository for :TSInstall
+---@field revision? string commit to install (default: latest)
+---@field path? string local tree-sitter-jason checkout, used instead of url
 
 local M = {}
 
@@ -21,6 +28,12 @@ M.defaults = {
   mind_url = "http://127.0.0.1:3272",
   runner = "terminal",
   terminal = { position = "botright", size = 15 },
+  treesitter = {
+    highlight = true,
+    url = "https://github.com/RayIci/tree-sitter-jason",
+    revision = nil,
+    path = nil,
+  },
 }
 
 ---@type jason.Config
