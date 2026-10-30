@@ -1,0 +1,22 @@
+{
+  "MAS project": {
+    "prefix": "MAS",
+    "body": [
+      "MAS ${1:name} {",
+      "",
+      "    environment: ${2:example.Env}",
+      "",
+      "    agents: ${3:bob};",
+      "            ${4:alice};",
+      "",
+      "    aslSourcePath: \"${5:src/agt}\";",
+      "}"
+    ],
+    "description": "Multi-agent system project"
+  },
+  "Agent with options": {
+    "prefix": "agent",
+    "body": ["${1:name} ${2:file.asl} [${3:verbose=1}] #${4:1};"],
+    "description": "Agent declaration with source, options and instance count"
+  }
+}

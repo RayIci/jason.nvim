@@ -1,0 +1,10 @@
+{
+  "name": "jason-nvim-snippets",
+  "description": "Snippets for Jason (AgentSpeak) agent programs",
+  "contributes": {
+    "snippets": [
+      { "language": ["jason"], "path": "./snippets/jason.json" },
+      { "language": ["mas2j"], "path": "./snippets/mas2j.json" }
+    ]
+  }
+}

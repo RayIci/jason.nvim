@@ -1,0 +1,82 @@
+{
+  "Achievement goal plan": {
+    "prefix": "+!",
+    "body": ["+!${1:goal}${2:(${3:Args})} : ${4:true}", "    <- ${0:.print(\"$1\")}."],
+    "description": "Plan for the addition of an achievement goal"
+  },
+  "Goal failure plan": {
+    "prefix": "-!",
+    "body": ["-!${1:goal}${2:(${3:Args})}[error(${4:E}), error_msg(${5:Msg})]", "    <- ${0:.print(\"failed $1: \", $5)}."],
+    "description": "Plan handling the failure of an achievement goal"
+  },
+  "Test goal plan": {
+    "prefix": "+?",
+    "body": ["+?${1:query}(${2:X}) : ${3:true}", "    <- ${0:true}."],
+    "description": "Plan for a test goal"
+  },
+  "Belief addition plan": {
+    "prefix": "+b",
+    "body": ["+${1:belief}${2:(${3:Args})}${4:[source(${5:A})]} : ${6:true}", "    <- ${0:true}."],
+    "description": "Plan reacting to a belief being added"
+  },
+  "Belief deletion plan": {
+    "prefix": "-b",
+    "body": ["-${1:belief}${2:(${3:Args})} : ${4:true}", "    <- ${0:true}."],
+    "description": "Plan reacting to a belief being removed"
+  },
+  "Labelled plan": {
+    "prefix": "@",
+    "body": ["@${1:label}${2:[atomic]}", "+!${3:goal} : ${4:true}", "    <- ${0:true}."],
+    "description": "Plan with a label and annotations"
+  },
+  "Rule": {
+    "prefix": "rule",
+    "body": ["${1:head}(${2:X}) :- ${0:body}."],
+    "description": "Prolog-like rule"
+  },
+  "Initial goal": {
+    "prefix": "!",
+    "body": ["!${1:start}."],
+    "description": "Initial achievement goal"
+  },
+  "if / else": {
+    "prefix": "if",
+    "body": ["if (${1:condition}) {", "    ${2:true}", "} else {", "    ${0:true}", "}"],
+    "description": "Conditional formula in a plan body"
+  },
+  "for": {
+    "prefix": "for",
+    "body": ["for (${1:.member(${2:X}, ${3:List})}) {", "    ${0:.print($2)}", "}"],
+    "description": "Iterate over all solutions of a logical formula"
+  },
+  "while": {
+    "prefix": "while",
+    "body": ["while (${1:condition}) {", "    ${0:true}", "}"],
+    "description": "Loop while a formula holds"
+  },
+  ".print": {
+    "prefix": ".print",
+    "body": [".print(${1:\"${2:message}\"})"],
+    "description": "Print to the agent console"
+  },
+  ".send": {
+    "prefix": ".send",
+    "body": [".send(${1:receiver}, ${2|tell,untell,achieve,unachieve,askOne,askAll,askHow,tellHow,untellHow|}, ${0:content})"],
+    "description": "Send a message to another agent"
+  },
+  ".broadcast": {
+    "prefix": ".broadcast",
+    "body": [".broadcast(${1|tell,untell,achieve,unachieve|}, ${0:content})"],
+    "description": "Send a message to all agents"
+  },
+  "include": {
+    "prefix": "include",
+    "body": ["{ include(\"${1:file}.asl\") }"],
+    "description": "Include another AgentSpeak file"
+  },
+  "namespace": {
+    "prefix": "namespace",
+    "body": ["{ begin namespace(${1:ns}, ${2|local,global|}) }", "", "$0", "", "{ end }"],
+    "description": "Module namespace block"
+  }
+}

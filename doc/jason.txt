@@ -1,0 +1,110 @@
+*jason.txt*  Jason (AgentSpeak) support for Neovim
+
+==============================================================================
+CONTENTS                                                      *jason-contents*
+
+  1. Introduction ............................... |jason-introduction|
+  2. Filetypes .................................. |jason-filetypes|
+  3. Commands ................................... |jason-commands|
+  4. Mappings ................................... |jason-mappings|
+  5. Configuration .............................. |jason-configuration|
+  6. Highlight groups ........................... |jason-highlights|
+
+==============================================================================
+1. INTRODUCTION                                           *jason-introduction*
+
+jason.nvim adds filetype detection, syntax highlighting, indentation,
+snippets and Jason CLI integration for Jason agent programs (`*.asl`) and
+multi-agent system project files (`*.mas2j`).
+
+No setup() call is needed.
+
+==============================================================================
+2. FILETYPES                                                 *jason-filetypes*
+
+`*.asl`     filetype `jason`
+`*.mas2j`   filetype `mas2j`
+
+Both set 'commentstring' to `// %s`. Unless |g:jason_recommended_style| is
+false, they also set 'expandtab' with 'shiftwidth', 'softtabstop' and
+'tabstop' at 4.
+
+                                                  *g:jason_recommended_style*
+Set to |v:false| to keep your own indentation options: >lua
+    vim.g.jason_recommended_style = false
+<
+==============================================================================
+3. COMMANDS                                                   *jason-commands*
+
+                                                                      *:Jason*
+:Jason run [file]       Run [file] (a `.mas2j`) or the project file nearest
+                        to the current buffer.
+:Jason compile          Run `jason app compile` in the project root.
+:Jason stop             Stop the system started by the terminal runner.
+:Jason mind             Open the Mind Inspector (|jason-config-mind_url|).
+:Jason new {name}       Run `jason app create {name}` in the current
+                        directory.
+:Jason add-agent {name} Run `jason app add-agent {name}` in the project root.
+
+The project file is the buffer itself when it is a `.mas2j`; otherwise it is
+the nearest `.mas2j` found searching upward from the buffer, then from the
+current directory. When a directory holds several you're asked to choose.
+
+==============================================================================
+4. MAPPINGS                                                   *jason-mappings*
+
+No keys are mapped. The following <Plug> mappings are available:
+
+<Plug>(jason-run)       |:Jason| run
+<Plug>(jason-compile)   |:Jason| compile
+<Plug>(jason-stop)      |:Jason| stop
+<Plug>(jason-mind)      |:Jason| mind
+
+==============================================================================
+5. CONFIGURATION                                         *jason-configuration*
+
+Pass options to `require("jason").setup()` or set `vim.g.jason` before the
+plugin loads. Defaults: >lua
+    {
+      cmd = "jason",
+      run_args = {},
+      mind_url = "http://127.0.0.1:3272",
+      runner = "terminal",
+      terminal = { position = "botright", size = 15 },
+    }
+<
+cmd                                                     *jason-config-cmd*
+    Jason CLI executable.
+
+run_args                                           *jason-config-run_args*
+    Extra arguments appended to `jason <app>.mas2j`.
+
+mind_url                                           *jason-config-mind_url*
+    URL opened by `:Jason mind`.
+
+runner                                               *jason-config-runner*
+    `"terminal"` runs commands in a split terminal. A function receives
+    `{ name, cmd, cwd }` and runs it however you like (overseer, toggleterm,
+    and so on). `:Jason stop` only knows about the terminal runner.
+
+terminal                                           *jason-config-terminal*
+    Split used by the terminal runner: `position` is a |:vertical| or
+    |:botright| style modifier, `size` the height (or width).
+
+==============================================================================
+6. HIGHLIGHT GROUPS                                         *jason-highlights*
+
+Groups are linked by default and can be overridden with |nvim_set_hl()|.
+
+jason:  jasonTrigger, jasonGoal, jasonBeliefUpdate, jasonInternalAction,
+        jasonFunctor, jasonNamespace, jasonVariable, jasonAnonVar,
+        jasonLabel, jasonAnnotation, jasonPerformative, jasonDirective,
+        jasonArrow, jasonNegation, jasonOperator, jasonConditional,
+        jasonRepeat, jasonBoolean, jasonNumber, jasonString,
+        jasonQuotedAtom, jasonEnd, jasonComment, jasonTodo
+
+mas2j:  mas2jKeyword, mas2jSection, mas2jOption, mas2jValue, mas2jBoolean,
+        mas2jClass, mas2jCount, mas2jNumber, mas2jString, mas2jDelimiter,
+        mas2jComment, mas2jTodo
+
+ vim:tw=78:ts=8:ft=help:norl:

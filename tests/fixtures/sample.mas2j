@@ -1,0 +1,10 @@
+/* demo */
+MAS demo {
+
+    environment: example.Env(10)
+
+    agents: bob;
+            alice agentArchClass jason.architecture.AgArch [verbose=2] #3;
+
+    aslSourcePath: "src/agt";
+}
