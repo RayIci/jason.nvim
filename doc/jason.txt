@@ -8,10 +8,11 @@ CONTENTS                                                      *jason-contents*
   3. Commands ................................... |jason-commands|
   4. Mappings ................................... |jason-mappings|
   5. Tree-sitter ................................ |jason-treesitter|
-  6. Linting .................................... |jason-linting|
-  7. Formatting ................................. |jason-formatting|
-  8. Configuration .............................. |jason-configuration|
-  9. Highlight groups ........................... |jason-highlights|
+  6. Language server ............................ |jason-lsp|
+  7. Linting .................................... |jason-linting|
+  8. Formatting ................................. |jason-formatting|
+  9. Configuration .............................. |jason-configuration|
+ 10. Highlight groups ........................... |jason-highlights|
 
 ==============================================================================
 1. INTRODUCTION                                           *jason-introduction*
@@ -77,7 +78,20 @@ buffers start tree-sitter highlighting and the Vim syntax is turned off;
 indentation keeps using the plugin's rules. See |jason-config-treesitter|.
 
 ==============================================================================
-6. LINTING                                                     *jason-linting*
+6. LANGUAGE SERVER                                                 *jason-lsp*
+
+`lsp/jason_ls.lua` configures jason-language-server for |vim.lsp.config()|.
+With `jason-language-server` on your PATH: >lua
+    vim.lsp.enable("jason_ls")
+<
+The root is the directory holding the `.mas2j` file, else the git root.
+Override the command for a local build: >lua
+    vim.lsp.config("jason_ls", {
+      cmd = { "node", "/path/to/jason-language-server/dist/server.js", "--stdio" },
+    })
+<
+==============================================================================
+7. LINTING                                                     *jason-linting*
 
 The `jasonlint` linter for nvim-lint runs the parsers bundled in the Jason
 jar on the buffer contents: >lua
@@ -94,7 +108,7 @@ Directives registered by a project's `.mas2j` cannot be checked in a single
 file: they are reported as a warning and the rest of the file is skipped.
 
 ==============================================================================
-7. FORMATTING                                               *jason-formatting*
+8. FORMATTING                                               *jason-formatting*
 
 The `jasonfmt` formatter for conform.nvim, also available as `:Jason format`: >lua
     require("conform").formatters_by_ft.jason = { "jasonfmt" }
@@ -106,7 +120,7 @@ space around `<-`, `:-`, `<:`, `&` and the context `:`; no space before `,` and
 lines re-indented with the plugin's indent rules. Long lines are not broken.
 
 ==============================================================================
-8. CONFIGURATION                                         *jason-configuration*
+9. CONFIGURATION                                         *jason-configuration*
 
 Pass options to `require("jason").setup()` or set `vim.g.jason` before the
 plugin loads. Defaults: >lua
@@ -155,7 +169,7 @@ treesitter                                       *jason-config-treesitter*
     parsers, so set them before that (e.g. with `vim.g.jason`).
 
 ==============================================================================
-9. HIGHLIGHT GROUPS                                         *jason-highlights*
+10. HIGHLIGHT GROUPS                                        *jason-highlights*
 
 These are the Vim syntax groups, used without the tree-sitter parser.
 Groups are linked by default and can be overridden with |nvim_set_hl()|.

@@ -33,6 +33,10 @@ agent-oriented language based on AgentSpeak.
 - **Linting** with the parser shipped in the Jason jar, through
   [nvim-lint](https://github.com/mfussenegger/nvim-lint): syntax errors in
   agent programs and project files, unsaved buffers included.
+- **Language server** config for
+  [jason-language-server](https://github.com/RayIci/jason-language-server):
+  outline, go to definition, references, hover docs for internal actions,
+  completion, and diagnostics as you type.
 - **Formatting** (whitespace and indentation only) through
   [conform.nvim](https://github.com/stevearc/conform.nvim) or `:Jason format`.
 - **`:Jason` command** wrapping the [Jason CLI](https://github.com/jason-lang/jason/tree/main/jason-cli):
@@ -50,6 +54,8 @@ JavaCC grammars) otherwise.
 - For tree-sitter highlighting (optional):
   [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter)
   (`main` branch) and a C compiler.
+- For the language server (optional): Node.js ≥ 20 and
+  [jason-language-server](https://github.com/RayIci/jason-language-server).
 - For linting: [nvim-lint](https://github.com/mfussenegger/nvim-lint), and
   `javac` for the faster compiled checker (optional).
 
@@ -171,6 +177,26 @@ vim.api.nvim_create_autocmd("FileType", {
 
 `.mas2j` files keep the Vim syntax; they're small and rarely edited.
 
+### Language server
+
+Install [jason-language-server](https://github.com/RayIci/jason-language-server)
+so `jason-language-server` is on `PATH`, then:
+
+```lua
+vim.lsp.enable("jason_ls")
+```
+
+The config lives in `lsp/jason_ls.lua`. The project root is the directory
+with the `.mas2j` file. To run a local build instead:
+
+```lua
+vim.lsp.config("jason_ls", { cmd = { "node", "/path/to/jason-language-server/dist/server.js", "--stdio" } })
+```
+
+The server reports every syntax error as you type. `jasonlint` (below) runs
+Jason's real parser, which is stricter but stops at the first error. Use
+either one, or both if you don't mind seeing some errors twice.
+
 ### Linting
 
 The plugin provides a `jasonlint` linter for nvim-lint:
@@ -272,9 +298,8 @@ Main groups: `jasonTrigger`, `jasonGoal`, `jasonBeliefUpdate`,
       with highlights, folds, text objects and locals
 - [ ] **Full formatting**: break long lines and lay out plan bodies, on top
       of the tree-sitter grammar
-- [ ] **Language server**: go to definition across plans and includes, plan
-      and belief outline, completion of beliefs, goals and internal actions,
-      and diagnostics
+- [x] **Language server**: [jason-language-server](https://github.com/RayIci/jason-language-server)
+      with outline, definitions, references, hover, completion and diagnostics
 
 ## Development
 
@@ -282,6 +307,7 @@ Main groups: `jasonTrigger`, `jasonGoal`, `jasonBeliefUpdate`,
 nvim --clean --headless -l tests/run.lua
 nvim --clean --headless -l tests/lint.lua         # needs nvim-lint and the jason CLI
 nvim --clean --headless -l tests/treesitter.lua   # needs ../tree-sitter-jason and cc
+nvim --clean --headless -l tests/lsp.lua          # needs ../jason-language-server built, and node
 ```
 
 `tests/run.lua` checks filetype detection, the syntax group at each construct
