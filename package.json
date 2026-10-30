@@ -1,0 +1,47 @@
+{
+  "name": "jason-language-server",
+  "version": "0.1.0",
+  "description": "Language server for Jason (AgentSpeak) agent programs",
+  "license": "MIT",
+  "author": "Alex Valle",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RayIci/jason-language-server"
+  },
+  "keywords": [
+    "jason",
+    "agentspeak",
+    "bdi",
+    "lsp",
+    "language-server"
+  ],
+  "type": "module",
+  "bin": {
+    "jason-language-server": "dist/server.js"
+  },
+  "files": [
+    "dist",
+    "grammar/tree-sitter-jason.wasm",
+    "LICENSE",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p .",
+    "test": "npm run build && node --test test/",
+    "grammar": "tree-sitter build --wasm -o grammar/tree-sitter-jason.wasm ../tree-sitter-jason",
+    "stdlib": "java -cp \"$(readlink -f \"$(command -v jason)\")\" scripts/ExtractStdlib.java > src/stdlib.json"
+  },
+  "dependencies": {
+    "vscode-languageserver": "^11.0.0",
+    "vscode-languageserver-textdocument": "^1.0.16",
+    "web-tree-sitter": "^0.27.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "typescript": "^7.0.2",
+    "vscode-jsonrpc": "^10.0.0"
+  }
+}
