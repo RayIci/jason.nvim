@@ -36,8 +36,38 @@ local function prev_code_line(lnum)
   return 0
 end
 
----Skip matches inside comments and strings (relies on the syntax file).
-local skip = [[synIDattr(synID(line('.'), col('.'), 0), 'name') =~? 'comment\|string\|quotedatom']]
+local ts_skip = { comment = true, string = true, escape_sequence = true, quoted_atom = true }
+
+---Whether (lnum, col), 1-based, is inside a comment, string or quoted atom.
+---Uses the tree-sitter tree when tree-sitter highlights the buffer (the
+---Vim syntax is off then), else the syntax file.
+---@param lnum integer
+---@param col integer
+---@return boolean
+local function in_string_or_comment(lnum, col)
+  local buf = vim.api.nvim_get_current_buf()
+  if vim.treesitter.highlighter.active[buf] then
+    local ok, node = pcall(vim.treesitter.get_node, { bufnr = buf, pos = { lnum - 1, col - 1 }, ignore_injections = true })
+    return ok and node ~= nil and ts_skip[node:type()] == true
+  end
+  local name = vim.fn.synIDattr(vim.fn.synID(lnum, col, 0), "name"):lower()
+  return name:find("comment") ~= nil or name:find("string") ~= nil or name:find("quotedatom") ~= nil
+end
+
+---searchpair() skip callback: ignore brackets in comments and strings.
+local function skip()
+  return in_string_or_comment(vim.fn.line("."), vim.fn.col("."))
+end
+
+---Bring the tree-sitter tree up to date before querying it.
+local function refresh_tree()
+  local buf = vim.api.nvim_get_current_buf()
+  if vim.treesitter.highlighter.active[buf] then
+    pcall(function()
+      vim.treesitter.get_parser(buf):parse()
+    end)
+  end
+end
 
 ---@param lnum integer
 ---@param open string
@@ -82,9 +112,10 @@ function M.get(lnum)
   local sw = vim.fn.shiftwidth()
   local cur = vim.fn.getline(lnum)
 
+  refresh_tree()
+
   -- Inside a block comment: keep the leading ' *' aligned.
-  if vim.fn.synIDattr(vim.fn.synID(lnum, vim.fn.indent(lnum) + 1, 0), "name") == "jasonComment"
-    and cur:match("^%s*%*") then
+  if cur:match("^%s*%*") and in_string_or_comment(lnum, vim.fn.indent(lnum) + 1) then
     return vim.fn.indent(lnum)
   end
 
@@ -144,6 +175,7 @@ end
 ---@param lnum integer
 ---@return integer
 function M.get_mas2j(lnum)
+  refresh_tree()
   local cur = vim.fn.getline(lnum)
   local closer = cur:match("^%s*([}%]])")
   if closer then
