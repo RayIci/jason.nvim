@@ -1,0 +1,31 @@
+{
+  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/config.schema.json",
+  "grammars": [
+    {
+      "name": "jason",
+      "camelcase": "Jason",
+      "title": "Jason",
+      "scope": "source.jason",
+      "path": ".",
+      "file-types": ["asl"],
+      "highlights": "queries/highlights.scm",
+      "injection-regex": "^(jason|agentspeak)$"
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT",
+    "description": "Jason (AgentSpeak) grammar for tree-sitter",
+    "authors": [{ "name": "Alex Valle" }],
+    "links": { "repository": "https://github.com/RayIci/tree-sitter-jason" }
+  },
+  "bindings": {
+    "c": true,
+    "go": false,
+    "node": false,
+    "python": false,
+    "rust": false,
+    "swift": false,
+    "zig": false
+  }
+}
