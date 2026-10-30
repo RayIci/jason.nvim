@@ -38,14 +38,18 @@ agent-oriented language based on AgentSpeak.
 - **`:Jason` command** wrapping the [Jason CLI](https://github.com/jason-lang/jason/tree/main/jason-cli):
   run, compile, stop, Mind Inspector, new app, add agent.
 
-Highlighting uses classic Vim syntax files, written from the official JavaCC
-grammars. There is no tree-sitter parser for Jason yet (see the [roadmap](#roadmap)).
+Highlighting uses [tree-sitter-jason](https://github.com/RayIci/tree-sitter-jason)
+when its parser is installed, and Vim syntax files (written from the official
+JavaCC grammars) otherwise.
 
 ## Requirements
 
 - Neovim ≥ 0.11
 - For `:Jason` and linting: the `jason` CLI in `PATH` (Java 17+). See the
   [installation guide](https://github.com/jason-lang/jason/blob/main/doc/install.adoc).
+- For tree-sitter highlighting (optional):
+  [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter)
+  (`main` branch) and a C compiler.
 - For linting: [nvim-lint](https://github.com/mfussenegger/nvim-lint), and
   `javac` for the faster compiled checker (optional).
 
@@ -80,6 +84,12 @@ require("jason").setup({
   mind_url = "http://127.0.0.1:3272",   -- opened by :Jason mind
   runner = "terminal",                  -- or fun(spec) to use your own task runner
   terminal = { position = "botright", size = 15 },
+  treesitter = {
+    highlight = true,                   -- start tree-sitter when the parser is installed
+    url = "https://github.com/RayIci/tree-sitter-jason",
+    revision = nil,                     -- pin a commit for :TSInstall
+    path = nil,                         -- or install from a local checkout
+  },
 })
 ```
 
@@ -130,6 +140,36 @@ vim.keymap.set("n", "<leader>jc", "<Plug>(jason-compile)")
 vim.keymap.set("n", "<leader>js", "<Plug>(jason-stop)")
 vim.keymap.set("n", "<leader>jm", "<Plug>(jason-mind)")
 ```
+
+### Tree-sitter
+
+jason.nvim registers the `jason` parser with nvim-treesitter, so install it once:
+
+```vim
+:TSInstall jason
+```
+
+From then on, jason buffers use tree-sitter highlighting with the grammar's
+queries: highlights, folds, locals, and text objects for
+[nvim-treesitter-textobjects](https://github.com/nvim-treesitter/nvim-treesitter-textobjects).
+Plans are `@function`, bodies `@function.inner`, and there are conditionals,
+loops and arguments too. Indentation stays with the plugin's own rules.
+
+If your config starts tree-sitter and its indentation for every installed
+parser, leave `jason` out of that list: the plugin starts highlighting itself.
+For tree-sitter folding:
+
+```lua
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "jason",
+  callback = function()
+    vim.wo.foldmethod = "expr"
+    vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+  end,
+})
+```
+
+`.mas2j` files keep the Vim syntax; they're small and rarely edited.
 
 ### Linting
 
@@ -228,11 +268,10 @@ Main groups: `jasonTrigger`, `jasonGoal`, `jasonBeliefUpdate`,
 - [x] `:Jason` command: run, compile, stop, Mind Inspector, new app, add agent
 - [x] **Linting** with the parser in the Jason jar, through nvim-lint
 - [x] **Formatting**: spacing and indentation, through conform.nvim or `:Jason format`
-- [ ] **Full formatting**: break long lines and lay out plan bodies (after
-      the tree-sitter grammar)
-- [ ] **Tree-sitter grammar** (`tree-sitter-jason`), generated from
-      `AS2JavaParser.jj`: better highlighting, text objects (plans, bodies),
-      folding, and a symbol outline
+- [x] **Tree-sitter grammar**: [tree-sitter-jason](https://github.com/RayIci/tree-sitter-jason)
+      with highlights, folds, text objects and locals
+- [ ] **Full formatting**: break long lines and lay out plan bodies, on top
+      of the tree-sitter grammar
 - [ ] **Language server**: go to definition across plans and includes, plan
       and belief outline, completion of beliefs, goals and internal actions,
       and diagnostics
@@ -241,13 +280,15 @@ Main groups: `jasonTrigger`, `jasonGoal`, `jasonBeliefUpdate`,
 
 ```sh
 nvim --clean --headless -l tests/run.lua
-nvim --clean --headless -l tests/lint.lua   # needs nvim-lint and the jason CLI
+nvim --clean --headless -l tests/lint.lua         # needs nvim-lint and the jason CLI
+nvim --clean --headless -l tests/treesitter.lua   # needs ../tree-sitter-jason and cc
 ```
 
 `tests/run.lua` checks filetype detection, the syntax group at each construct
 in `tests/fixtures/`, that re-indenting the fixtures leaves them unchanged,
 the formatter, and the `:Jason` command. `tests/lint.lua` runs the linter
-through nvim-lint.
+through nvim-lint. `tests/treesitter.lua` builds the parser and checks
+highlighting and indentation under tree-sitter.
 
 ## Credits
 

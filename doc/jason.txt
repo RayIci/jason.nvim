@@ -7,10 +7,11 @@ CONTENTS                                                      *jason-contents*
   2. Filetypes .................................. |jason-filetypes|
   3. Commands ................................... |jason-commands|
   4. Mappings ................................... |jason-mappings|
-  5. Linting .................................... |jason-linting|
-  6. Formatting ................................. |jason-formatting|
-  7. Configuration .............................. |jason-configuration|
-  8. Highlight groups ........................... |jason-highlights|
+  5. Tree-sitter ................................ |jason-treesitter|
+  6. Linting .................................... |jason-linting|
+  7. Formatting ................................. |jason-formatting|
+  8. Configuration .............................. |jason-configuration|
+  9. Highlight groups ........................... |jason-highlights|
 
 ==============================================================================
 1. INTRODUCTION                                           *jason-introduction*
@@ -67,7 +68,16 @@ No keys are mapped. The following <Plug> mappings are available:
 <Plug>(jason-mind)      |:Jason| mind
 
 ==============================================================================
-5. LINTING                                                     *jason-linting*
+5. TREE-SITTER                                              *jason-treesitter*
+
+The `jason` parser (tree-sitter-jason) is registered with nvim-treesitter
+(`main` branch), so `:TSInstall jason` installs it together with its queries
+(highlights, folds, textobjects, locals). When the parser is installed, jason
+buffers start tree-sitter highlighting and the Vim syntax is turned off;
+indentation keeps using the plugin's rules. See |jason-config-treesitter|.
+
+==============================================================================
+6. LINTING                                                     *jason-linting*
 
 The `jasonlint` linter for nvim-lint runs the parsers bundled in the Jason
 jar on the buffer contents: >lua
@@ -84,7 +94,7 @@ Directives registered by a project's `.mas2j` cannot be checked in a single
 file: they are reported as a warning and the rest of the file is skipped.
 
 ==============================================================================
-6. FORMATTING                                               *jason-formatting*
+7. FORMATTING                                               *jason-formatting*
 
 The `jasonfmt` formatter for conform.nvim, also available as `:Jason format`: >lua
     require("conform").formatters_by_ft.jason = { "jasonfmt" }
@@ -96,7 +106,7 @@ space around `<-`, `:-`, `<:`, `&` and the context `:`; no space before `,` and
 lines re-indented with the plugin's indent rules. Long lines are not broken.
 
 ==============================================================================
-7. CONFIGURATION                                         *jason-configuration*
+8. CONFIGURATION                                         *jason-configuration*
 
 Pass options to `require("jason").setup()` or set `vim.g.jason` before the
 plugin loads. Defaults: >lua
@@ -107,6 +117,12 @@ plugin loads. Defaults: >lua
       mind_url = "http://127.0.0.1:3272",
       runner = "terminal",
       terminal = { position = "botright", size = 15 },
+      treesitter = {
+        highlight = true,
+        url = "https://github.com/RayIci/tree-sitter-jason",
+        revision = nil,
+        path = nil,
+      },
     }
 <
 cmd                                                     *jason-config-cmd*
@@ -131,9 +147,17 @@ terminal                                           *jason-config-terminal*
     Split used by the terminal runner: `position` is a |:vertical| or
     |:botright| style modifier, `size` the height (or width).
 
-==============================================================================
-8. HIGHLIGHT GROUPS                                         *jason-highlights*
+treesitter                                       *jason-config-treesitter*
+    `highlight`: start tree-sitter highlighting when the parser is
+    installed. `url` and `revision`: where `:TSInstall jason` gets the
+    grammar. `path`: a local tree-sitter-jason checkout used instead of
+    `url`. These options are read when nvim-treesitter installs or updates
+    parsers, so set them before that (e.g. with `vim.g.jason`).
 
+==============================================================================
+9. HIGHLIGHT GROUPS                                         *jason-highlights*
+
+These are the Vim syntax groups, used without the tree-sitter parser.
 Groups are linked by default and can be overridden with |nvim_set_hl()|.
 
 jason:  jasonTrigger, jasonGoal, jasonBeliefUpdate, jasonInternalAction,
