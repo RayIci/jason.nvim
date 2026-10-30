@@ -7,7 +7,9 @@
       "title": "Jason",
       "scope": "source.jason",
       "path": ".",
-      "file-types": ["asl"],
+      "file-types": [
+        "asl"
+      ],
       "highlights": "queries/highlights.scm",
       "injection-regex": "^(jason|agentspeak)$"
     }
@@ -16,8 +18,14 @@
     "version": "0.1.0",
     "license": "MIT",
     "description": "Jason (AgentSpeak) grammar for tree-sitter",
-    "authors": [{ "name": "Alex Valle" }],
-    "links": { "repository": "https://github.com/RayIci/tree-sitter-jason" }
+    "authors": [
+      {
+        "name": "Alex Valle"
+      }
+    ],
+    "links": {
+      "repository": "https://github.com/RayIci/jason.nvim"
+    }
   },
   "bindings": {
     "c": true,

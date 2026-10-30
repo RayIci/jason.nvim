@@ -5,21 +5,22 @@ local config = require("jason.config")
 
 local M = {}
 
----Make `:TSInstall jason` work (nvim-treesitter `main` branch). Idempotent.
+---Make `:TSInstall jason` work (nvim-treesitter `main` branch). The grammar
+---lives in tree-sitter-jason/ inside this plugin, so it is compiled from the
+---plugin's own directory and always matches the plugin version. Idempotent.
 function M.register()
   vim.api.nvim_create_autocmd("User", {
     group = vim.api.nvim_create_augroup("jason.treesitter", { clear = true }),
     pattern = "TSUpdate",
     callback = function()
-      local opts = config.options.treesitter
-      local install_info = { queries = "queries" }
-      if opts.path then
-        install_info.path = vim.fs.normalize(opts.path)
-      else
-        install_info.url = opts.url
-        install_info.revision = opts.revision
-      end
-      require("nvim-treesitter.parsers").jason = { install_info = install_info }
+      local path = config.options.treesitter.path
+      require("nvim-treesitter.parsers").jason = {
+        install_info = {
+          path = path and vim.fs.normalize(path) or require("jason.paths").root,
+          location = "tree-sitter-jason",
+          queries = "tree-sitter-jason/queries",
+        },
+      }
     end,
   })
 end

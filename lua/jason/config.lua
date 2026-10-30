@@ -14,9 +14,8 @@
 
 ---@class jason.TreesitterConfig
 ---@field highlight boolean start tree-sitter highlighting when the parser is installed
----@field url string tree-sitter-jason repository for :TSInstall
----@field revision? string commit to install (default: latest)
----@field path? string local tree-sitter-jason checkout, used instead of url
+---@field path? string jason.nvim checkout whose tree-sitter-jason/ :TSInstall
+---  compiles (default: this plugin's own directory)
 
 local M = {}
 
@@ -30,8 +29,6 @@ M.defaults = {
   terminal = { position = "botright", size = 15 },
   treesitter = {
     highlight = true,
-    url = "https://github.com/RayIci/tree-sitter-jason",
-    revision = nil,
     path = nil,
   },
 }

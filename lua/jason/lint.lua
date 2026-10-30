@@ -7,8 +7,7 @@ local config = require("jason.config")
 
 local M = {}
 
-local root = vim.fs.dirname(vim.fs.dirname(vim.fs.dirname(debug.getinfo(1, "S").source:sub(2))))
-M.script = vim.fs.joinpath(root, "tools", "JasonLint.java")
+M.script = vim.fs.joinpath(require("jason.paths").root, "tools", "JasonLint.java")
 
 ---The Jason jar: the `jar` option, or the `jason` launcher in PATH, which is
 ---a jar with a shell stub in front of it.

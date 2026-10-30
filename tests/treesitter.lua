@@ -1,8 +1,8 @@
 -- tree-sitter checks: nvim --clean --headless -l tests/treesitter.lua
--- Builds the parser from TREE_SITTER_JASON (default: ../tree-sitter-jason)
+-- Builds the parser from tree-sitter-jason/ (or TREE_SITTER_JASON)
 -- with cc; skipped when the checkout or cc is missing.
 local root = vim.fs.dirname(vim.fs.dirname(vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":p")))
-local grammar = vim.fs.normalize(os.getenv("TREE_SITTER_JASON") or (vim.fs.dirname(root) .. "/tree-sitter-jason"))
+local grammar = vim.fs.normalize(os.getenv("TREE_SITTER_JASON") or (root .. "/tree-sitter-jason"))
 if not vim.uv.fs_stat(grammar .. "/src/parser.c") or vim.fn.executable("cc") == 0 then
   io.stdout:write("skipped: needs " .. grammar .. "/src/parser.c and cc\n")
   os.exit(0)
@@ -77,11 +77,10 @@ local nvim_ts = vim.iter({ data .. "/site/pack/core/opt/nvim-treesitter", data .
 end)
 if nvim_ts then
   vim.opt.rtp:prepend(nvim_ts)
-  require("jason").setup({ treesitter = { path = grammar } })
   vim.api.nvim_exec_autocmds("User", { pattern = "TSUpdate" })
   local info = require("nvim-treesitter.parsers").jason
-  check(info and info.install_info.path == grammar and info.install_info.queries == "queries",
-    "TSUpdate registers the parser: " .. vim.inspect(info))
+  check(info and info.install_info.path == root and info.install_info.location == "tree-sitter-jason"
+    and info.install_info.queries == "tree-sitter-jason/queries", "TSUpdate registers the bundled grammar: " .. vim.inspect(info))
 end
 
 io.stdout:write(failures == 0 and "all tree-sitter checks passed\n" or (failures .. " failure(s)\n"))
