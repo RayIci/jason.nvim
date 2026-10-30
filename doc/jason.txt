@@ -8,14 +8,15 @@ CONTENTS                                                      *jason-contents*
   3. Commands ................................... |jason-commands|
   4. Mappings ................................... |jason-mappings|
   5. Linting .................................... |jason-linting|
-  6. Configuration .............................. |jason-configuration|
-  7. Highlight groups ........................... |jason-highlights|
+  6. Formatting ................................. |jason-formatting|
+  7. Configuration .............................. |jason-configuration|
+  8. Highlight groups ........................... |jason-highlights|
 
 ==============================================================================
 1. INTRODUCTION                                           *jason-introduction*
 
 jason.nvim adds filetype detection, syntax highlighting, indentation,
-snippets, linting and Jason CLI integration for Jason agent programs (`*.asl`) and
+snippets, linting, formatting and Jason CLI integration for Jason agent programs (`*.asl`) and
 multi-agent system project files (`*.mas2j`).
 
 No setup() call is needed.
@@ -43,6 +44,7 @@ Set to |v:false| to keep your own indentation options: >lua
 :Jason compile          Run `jason app compile` in the project root.
 :Jason stop             Stop the system started by the terminal runner.
 :Jason mind             Open the Mind Inspector (|jason-config-mind_url|).
+:Jason format           Format the current buffer (|jason-formatting|).
 :Jason new {name}       Run `jason app create {name}` in the current
                         directory.
 :Jason add-agent {name} Run `jason app add-agent {name}` in the project root.
@@ -82,7 +84,19 @@ Directives registered by a project's `.mas2j` cannot be checked in a single
 file: they are reported as a warning and the rest of the file is skipped.
 
 ==============================================================================
-6. CONFIGURATION                                         *jason-configuration*
+6. FORMATTING                                               *jason-formatting*
+
+The `jasonfmt` formatter for conform.nvim, also available as `:Jason format`: >lua
+    require("conform").formatters_by_ft.jason = { "jasonfmt" }
+    require("conform").formatters_by_ft.mas2j = { "jasonfmt" }
+<
+It only changes whitespace outside strings, quoted atoms and comments: one
+space around `<-`, `:-`, `<:`, `&` and the context `:`; no space before `,` and
+`;` and one after; trailing whitespace removed; blank-line runs collapsed;
+lines re-indented with the plugin's indent rules. Long lines are not broken.
+
+==============================================================================
+7. CONFIGURATION                                         *jason-configuration*
 
 Pass options to `require("jason").setup()` or set `vim.g.jason` before the
 plugin loads. Defaults: >lua
@@ -118,7 +132,7 @@ terminal                                           *jason-config-terminal*
     |:botright| style modifier, `size` the height (or width).
 
 ==============================================================================
-7. HIGHLIGHT GROUPS                                         *jason-highlights*
+8. HIGHLIGHT GROUPS                                         *jason-highlights*
 
 Groups are linked by default and can be overridden with |nvim_set_hl()|.
 

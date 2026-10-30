@@ -33,6 +33,8 @@ agent-oriented language based on AgentSpeak.
 - **Linting** with the parser shipped in the Jason jar, through
   [nvim-lint](https://github.com/mfussenegger/nvim-lint): syntax errors in
   agent programs and project files, unsaved buffers included.
+- **Formatting** (whitespace and indentation only) through
+  [conform.nvim](https://github.com/stevearc/conform.nvim) or `:Jason format`.
 - **`:Jason` command** wrapping the [Jason CLI](https://github.com/jason-lang/jason/tree/main/jason-cli):
   run, compile, stop, Mind Inspector, new app, add agent.
 
@@ -111,6 +113,7 @@ require("jason").setup({
 | `:Jason compile`         | `jason app compile` in the project root                        |
 | `:Jason stop`            | Stop the system started by the built-in terminal runner        |
 | `:Jason mind`            | Open the Mind Inspector in the browser                         |
+| `:Jason format`          | Format the current buffer                                      |
 | `:Jason new {name}`      | `jason app create {name}` in the current directory             |
 | `:Jason add-agent {name}`| `jason app add-agent {name}` in the project root               |
 
@@ -152,6 +155,31 @@ You can also run the checker from a shell:
 ```sh
 java -cp "$(readlink -f "$(command -v jason)")" tools/JasonLint.java src/agt/bob.asl
 ```
+
+### Formatting
+
+The plugin provides a `jasonfmt` formatter for conform.nvim:
+
+```lua
+require("conform").formatters_by_ft.jason = { "jasonfmt" }
+require("conform").formatters_by_ft.mas2j = { "jasonfmt" }
+```
+
+Without conform, use `:Jason format`. The formatter only changes
+whitespace, outside strings, quoted atoms and comments:
+
+- one space around `<-`, `:-`, `<:`, `&` and the context `:` (`|&|` and `|||`
+  stay as they are);
+- no space before `,` and `;`, one after;
+- trailing whitespace removed, runs of blank lines collapsed to one;
+- re-indented with the plugin's indent rules.
+
+```agentspeak
++!start:true<-.print("hi");!!loop(_,X).        // before
++!start : true <- .print("hi"); !!loop(_, X).  // after
+```
+
+It doesn't break long lines or move plan bodies onto their own lines.
 
 ### Snippets
 
@@ -199,9 +227,9 @@ Main groups: `jasonTrigger`, `jasonGoal`, `jasonBeliefUpdate`,
 - [x] Snippets (VS Code format)
 - [x] `:Jason` command: run, compile, stop, Mind Inspector, new app, add agent
 - [x] **Linting** with the parser in the Jason jar, through nvim-lint
-- [ ] **Formatting**: re-indent plan bodies and normalise spacing around
-      `:`, `<-` and `;` (a Lua formatter usable from
-      [conform.nvim](https://github.com/stevearc/conform.nvim))
+- [x] **Formatting**: spacing and indentation, through conform.nvim or `:Jason format`
+- [ ] **Full formatting**: break long lines and lay out plan bodies (after
+      the tree-sitter grammar)
 - [ ] **Tree-sitter grammar** (`tree-sitter-jason`), generated from
       `AS2JavaParser.jj`: better highlighting, text objects (plans, bodies),
       folding, and a symbol outline
@@ -216,9 +244,10 @@ nvim --clean --headless -l tests/run.lua
 nvim --clean --headless -l tests/lint.lua   # needs nvim-lint and the jason CLI
 ```
 
-This checks filetype detection, the syntax group at each construct in
-`tests/fixtures/`, that re-indenting the fixtures leaves them unchanged, and
-the `:Jason` command.
+`tests/run.lua` checks filetype detection, the syntax group at each construct
+in `tests/fixtures/`, that re-indenting the fixtures leaves them unchanged,
+the formatter, and the `:Jason` command. `tests/lint.lua` runs the linter
+through nvim-lint.
 
 ## Credits
 
