@@ -1,0 +1,66 @@
+================================================================================
+Include and namespace blocks
+================================================================================
+
+{ include("common.asl") }
+{ begin namespace(ns, local) }
+b(1).
++!g <- .print(b).
+{ end }
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (directive
+    (atom
+      (identifier))
+    (arguments
+      (string)))
+  (directive
+    (atom
+      (identifier))
+    (arguments
+      (literal
+        (atom
+          (identifier)))
+      (literal
+        (atom
+          (identifier))))
+    (belief
+      (literal
+        (atom
+          (identifier))
+        (arguments
+          (number))))
+    (plan
+      (trigger
+        (literal
+          (atom
+            (identifier))))
+      (plan_body
+        (literal
+          (internal_action)
+          (arguments
+            (literal
+              (atom
+                (identifier)))))))))
+
+================================================================================
+Comments
+================================================================================
+
+// line comment
+/* block
+   comment */
+b. // trailing
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (comment)
+  (comment)
+  (belief
+    (literal
+      (atom
+        (identifier))))
+  (comment))

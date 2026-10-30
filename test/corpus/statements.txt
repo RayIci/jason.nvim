@@ -1,0 +1,88 @@
+================================================================================
+If, elif and else
+================================================================================
+
++!g <- if (X > 1) { a } elif (X == 1) { b; c } else { d }; e.
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (plan
+    (trigger
+      (literal
+        (atom
+          (identifier))))
+    (plan_body
+      (if_statement
+        (binary_expression
+          (literal
+            (variable))
+          (number))
+        (block
+          (plan_body
+            (literal
+              (atom
+                (identifier)))))
+        (elif_clause
+          (binary_expression
+            (literal
+              (variable))
+            (number))
+          (block
+            (plan_body
+              (literal
+                (atom
+                  (identifier)))
+              (literal
+                (atom
+                  (identifier)))))
+          (else_clause
+            (block
+              (plan_body
+                (literal
+                  (atom
+                    (identifier))))))))
+      (literal
+        (atom
+          (identifier))))))
+
+================================================================================
+For and while
+================================================================================
+
++!g <- for (.member(X, L)) { .print(X) } while (busy) { .wait(10) }.
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (plan
+    (trigger
+      (literal
+        (atom
+          (identifier))))
+    (plan_body
+      (for_statement
+        (literal
+          (internal_action)
+          (arguments
+            (literal
+              (variable))
+            (literal
+              (variable))))
+        (block
+          (plan_body
+            (literal
+              (internal_action)
+              (arguments
+                (literal
+                  (variable)))))))
+      (while_statement
+        (literal
+          (atom
+            (identifier)))
+        (block
+          (plan_body
+            (literal
+              (internal_action)
+              (arguments
+                (number)))))))))

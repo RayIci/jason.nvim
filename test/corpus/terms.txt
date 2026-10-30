@@ -1,0 +1,107 @@
+================================================================================
+Plan terms
+================================================================================
+
++!g <- .add_plan({@l +!h : c <- a}); .relevant_plans({+!h}, L); P = {@Label +!T : C <- B}.
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (plan
+    (trigger
+      (literal
+        (atom
+          (identifier))))
+    (plan_body
+      (literal
+        (internal_action)
+        (arguments
+          (plan_term
+            (label
+              (atom
+                (identifier)))
+            (trigger
+              (literal
+                (atom
+                  (identifier))))
+            (literal
+              (atom
+                (identifier)))
+            (plan_body
+              (literal
+                (atom
+                  (identifier)))))))
+      (literal
+        (internal_action)
+        (arguments
+          (plan_term
+            (trigger
+              (literal
+                (atom
+                  (identifier)))))
+          (literal
+            (variable))))
+      (binary_expression
+        (literal
+          (variable))
+        (plan_term
+          (label
+            (variable))
+          (trigger
+            (literal
+              (variable)))
+          (literal
+            (variable))
+          (plan_body
+            (literal
+              (variable))))))))
+
+================================================================================
+Expressions
+================================================================================
+
+x(A) :- A = -1 + B * 2 ** 3 div 4 mod 5 & S =.. [F, Args, Annots] & A \== B.
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (rule
+    (literal
+      (atom
+        (identifier))
+      (arguments
+        (literal
+          (variable))))
+    (binary_expression
+      (binary_expression
+        (literal
+          (variable))
+        (binary_expression
+          (unary_expression
+            (number))
+          (binary_expression
+            (binary_expression
+              (binary_expression
+                (literal
+                  (variable))
+                (binary_expression
+                  (number)
+                  (number)))
+              (number))
+            (number))))
+      (binary_expression
+        (binary_expression
+          (literal
+            (variable))
+          (list
+            (literal
+              (variable))
+            (literal
+              (variable))
+            (literal
+              (variable))))
+        (binary_expression
+          (literal
+            (variable))
+          (literal
+            (variable)))))))
