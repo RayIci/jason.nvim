@@ -5,6 +5,7 @@
 
 ---@class jason.Config
 ---@field cmd string Jason CLI executable
+---@field jar? string Jason jar used by the linter (default: the `cmd` launcher)
 ---@field run_args string[] extra arguments for `jason <file>.mas2j`
 ---@field mind_url string Mind Inspector URL opened by `:Jason mind`
 ---@field runner "terminal"|fun(spec: jason.RunSpec) how commands are executed
@@ -15,6 +16,7 @@ local M = {}
 ---@type jason.Config
 M.defaults = {
   cmd = "jason",
+  jar = nil,
   run_args = {},
   mind_url = "http://127.0.0.1:3272",
   runner = "terminal",
