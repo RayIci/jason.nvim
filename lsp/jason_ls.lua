@@ -1,8 +1,12 @@
--- jason-language-server (https://github.com/RayIci/jason-language-server)
+-- jason-language-server: bundled in server/ (build it with :Jason build-server),
+-- else `jason-language-server` from PATH.
 -- Enable with vim.lsp.enable("jason_ls").
+local paths = require("jason.paths")
+
 ---@type vim.lsp.Config
 return {
-  cmd = { "jason-language-server", "--stdio" },
+  cmd = vim.uv.fs_stat(paths.server_main) and { "node", paths.server_main, "--stdio" }
+    or { "jason-language-server", "--stdio" },
   filetypes = { "jason" },
   -- The project root holds the .mas2j file; fall back to the git root.
   root_dir = function(bufnr, on_dir)

@@ -6,7 +6,8 @@
   "author": "Alex Valle",
   "repository": {
     "type": "git",
-    "url": "https://github.com/RayIci/jason-language-server"
+    "url": "https://github.com/RayIci/jason.nvim",
+    "directory": "server"
   },
   "keywords": [
     "jason",

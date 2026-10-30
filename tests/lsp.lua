@@ -1,8 +1,8 @@
 -- LSP checks: nvim --clean --headless -l tests/lsp.lua
--- Uses JASON_LS (path to dist/server.js; default ../jason-language-server)
--- and node; skipped when either is missing.
+-- Uses the bundled server (server/dist/server.js, built with npm) or
+-- JASON_LS, and node; skipped when either is missing.
 local root = vim.fs.dirname(vim.fs.dirname(vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":p")))
-local server_repo = vim.fs.dirname(root) .. "/jason-language-server"
+local server_repo = root .. "/server"
 local server = vim.fs.normalize(os.getenv("JASON_LS") or (server_repo .. "/dist/server.js"))
 if not vim.uv.fs_stat(server) or vim.fn.executable("node") == 0 then
   io.stdout:write("skipped: needs " .. server .. " and node\n")
@@ -19,6 +19,11 @@ local function check(ok, msg)
   end
 end
 
+if not os.getenv("JASON_LS") then
+  -- lsp/jason_ls.lua picks the bundled build by itself
+  local cmd = dofile(root .. "/lsp/jason_ls.lua").cmd
+  check(cmd[2] == server, "jason_ls uses the bundled server: " .. vim.inspect(cmd))
+end
 vim.lsp.config("jason_ls", { cmd = { "node", server, "--stdio" } })
 vim.lsp.enable("jason_ls")
 

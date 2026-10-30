@@ -42,6 +42,11 @@ local subcommands = {
       require("jason.format").buffer(0)
     end,
   },
+  ["build-server"] = {
+    impl = function()
+      require("jason.server").build()
+    end,
+  },
   new = {
     nargs = "1",
     prompt = "New Jason app name: ",
